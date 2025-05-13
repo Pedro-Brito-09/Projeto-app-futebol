@@ -15,6 +15,7 @@ public class Jogo : IJogo
     private string Campo;
     private int Jogadores;
     private int MaxTimes;
+    private List<Time> Times;
     public Jogo(int id, string data, string local, string campo, int jogadores, int maxTimes)
     {
         this.Id = id;
@@ -54,6 +55,11 @@ public class Jogo : IJogo
         return this.MaxTimes;
     }
 
+    public Time GetTime(int index)
+    {
+        return this.Times[index];
+    }
+
     public void SetId(int id)
     {
         this.Id = id;
@@ -81,5 +87,10 @@ public class Jogo : IJogo
     public void SetMaxTimes(int maxTimes)
     {
         this.MaxTimes = maxTimes;
+    }
+
+    public void SetTimes(Time time1, Time time2)
+    {
+        this.Times = new List<Time> { time1, time2 };
     }
 }

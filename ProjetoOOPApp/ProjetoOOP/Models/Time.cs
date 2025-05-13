@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace ProjetoOOP.Models;
 
-internal class Time
+public class Time
 {
-    private string nome { get; set; }
+    private string nome;
+    private int vitorias;
+    private int derrotas;
+    private int empates;
     private List<Jogador> jogadores = new List<Jogador>();
     
     public Time(string nome)
@@ -38,5 +41,43 @@ internal class Time
         this.jogadores.Remove(jogador);
     }
 
+    public string GetNome()
+    {
+        return this.nome;
+    }
 
+    public int GetQuantidadeJogadores()
+    {
+        return this.jogadores.Count;
+    }
+
+    public void AddVitoria()
+    {
+        this.vitorias++;
+    }
+
+    public void AddDerrota()
+    {
+        this.derrotas++;
+    }
+
+    public void AddEmpate()
+    {
+        this.empates++;
+    }
+
+    public int GetVitorias()
+    {
+        return this.vitorias;
+    }
+
+    public int GetDerrotas()
+    {
+        return this.derrotas;
+    }
+
+    public int GetEmpates()
+    {
+        return this.empates;
+    }
 }

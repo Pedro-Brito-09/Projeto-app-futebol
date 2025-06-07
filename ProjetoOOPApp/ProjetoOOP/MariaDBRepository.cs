@@ -1,4 +1,4 @@
-//MariaDBRepository.cs 
+//MariaDBRepository.cs
 
 using System;
 using System.Linq;

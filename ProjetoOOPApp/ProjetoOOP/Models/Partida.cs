@@ -27,6 +27,6 @@ public class Partida
 
     public override string ToString()
     {
-        return $"{TimeA.GetNome()} {GolsTimeA} x {GolsTimeB} {TimeB} - {Data:dd/MM HH:mm}";
+        return $"{TimeA.GetNome()} {GolsTimeA} x {GolsTimeB} {TimeB.GetNome()} - {Data:dd/MM HH:mm}";
     }
 }

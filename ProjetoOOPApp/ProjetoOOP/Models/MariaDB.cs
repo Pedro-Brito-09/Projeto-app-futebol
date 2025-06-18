@@ -16,6 +16,10 @@ public class MariaDB
     public void Connect()
     {
         connection.Open();
+
+        string query = "USE erpdobaba; CREATE TABLE IF NOT EXISTS jogadores (id INT AUTO_INCREMENT PRIMARY KEY, nome VARCHAR(100), idade INT, posicao VARCHAR(20)); CREATE TABLE IF NOT EXISTS jogos (id INT AUTO_INCREMENT PRIMARY KEY, data VARCHAR(20), local VARCHAR(100), campo VARCHAR(50), jogadores INT, maxTimes INT);";
+        using var cmd = new MySqlCommand(query, connection);
+        using var reader = cmd.ExecuteReader();
     }
 
     public List<Jogador> GetJogadores()
@@ -45,13 +49,18 @@ public class MariaDB
         }
     }
 
+    public void EditarJogador(int id, Jogador jogador)
+    {
+        string query = "UPDATE jogadores SET nome = '" + jogador.GetNome() + "', idade = " + jogador.GetIdade() + ", posicao = '" + jogador.GetPosicao().ToString() + "' WHERE id = " + id;
+        using var cmd = new MySqlCommand(query, connection);
+        using var reader = cmd.ExecuteReader();
+    }
+
     public void RemoveJogador(int id)
     {
         string query = "DELETE FROM jogadores WHERE id = " + id;
         using var cmd = new MySqlCommand(query, connection);
         using var reader = cmd.ExecuteReader();
-
-        Console.WriteLine("Jogador removido com sucesso!");
     }
 
     public List<Jogo> GetJogos()
@@ -88,5 +97,42 @@ public class MariaDB
         using var reader = cmd.ExecuteReader();
 
         while (reader.Read()) {}
+    }
+
+    public List<Jogador> GetJogadoresDisponiveis(List<Time> todosTimes)
+    {
+        List<Jogador> todosJogadores = GetJogadores();
+        List<Jogador> jogadoresEmTimes = new List<Jogador>();
+
+        foreach (Time time in todosTimes)
+        {
+            foreach (Jogador jogador in time.GetJogadores())
+            {
+                jogadoresEmTimes.Add(jogador);
+            }
+        }
+
+        List<Jogador> jogadoresDisponiveis = new List<Jogador>();
+
+        foreach (Jogador jogador in todosJogadores)
+        {
+            bool estaEmTime = false;
+            foreach (Jogador jogadorTime in jogadoresEmTimes)
+            {
+                if (jogador.GetId() == jogadorTime.GetId())
+                {
+                    estaEmTime = true;
+                    break;
+                }
+            }
+
+            if (!estaEmTime)
+            {
+                Console.WriteLine(jogador.GetId());
+                jogadoresDisponiveis.Add(jogador);
+            }
+        }
+
+        return jogadoresDisponiveis;
     }
 }

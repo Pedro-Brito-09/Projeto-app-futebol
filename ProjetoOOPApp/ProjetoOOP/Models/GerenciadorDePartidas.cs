@@ -28,7 +28,7 @@ public class GerenciadorPartidas
         ultimoVencedor = null;
     }
 
-    public void IniciarNovaPartida()
+    public void IniciarNovaPartida(MariaDB Database)
     {
         if (timesDisponiveis.Count < 2)
             throw new InvalidOperationException("Não há times suficientes para iniciar uma partida");
@@ -37,11 +37,10 @@ public class GerenciadorPartidas
 
         if (modoAtual == ModosDePartida.GANHA_FICA)
         {
-            // Modo "ganha fica" - o vencedor da última partida continua
             timeA = ultimoVencedor ?? ObterTimeComMenosJogos();
             timeB = ObterTimeComMenosJogos(excluir: timeA);
         }
-        else // Modo DoisJogos
+        else
         {
             if (ultimoVencedor == null)
             {
@@ -55,8 +54,49 @@ public class GerenciadorPartidas
             }
         }
 
+        timeA.LimparTime();
+        timeB.LimparTime();
+
+        PreencherTime(timeA, Database.GetJogadoresDisponiveis(timesDisponiveis));
+        PreencherTime(timeB, Database.GetJogadoresDisponiveis(timesDisponiveis));
+
         partidaAtual = new Partida(timeA, timeB);
         Console.WriteLine($"Nova partida criada: {timeA.GetNome()} vs {timeB.GetNome()}");
+
+        timeA.ListarJogadores();
+        Console.WriteLine();
+        timeB.ListarJogadores();
+    }
+
+    private void PreencherTime(Time time, List<Jogador> jogadoresDisponiveis)
+    {
+        foreach (Jogador jogador in jogadoresDisponiveis)
+        {
+            if (jogador.GetPosicao() == Posicoes.GOLEIRO)
+            {
+                time.AddJogador(jogador);
+                break;
+            }
+        }
+
+        int jogadoresPorTime = 5;
+        int jogadoresAdicionados = time.GetQuantidadeJogadores();
+
+        foreach (Jogador jogador in jogadoresDisponiveis)
+        {
+            if (jogadoresAdicionados >= jogadoresPorTime)
+            {
+                Console.WriteLine("CHEIO");
+                break;
+            }
+            
+            if (jogador.GetPosicao() != Posicoes.GOLEIRO && !time.GetJogadores().Contains(jogador))
+            {
+                Console.WriteLine("ADICIONANDO");
+                time.AddJogador(jogador);
+                jogadoresAdicionados++;
+            }
+        }
     }
 
     public void RegistrarResultado(int golsTimeA, int golsTimeB)
@@ -67,7 +107,6 @@ public class GerenciadorPartidas
         partidaAtual.GolsTimeA = golsTimeA;
         partidaAtual.GolsTimeB = golsTimeB;
 
-        // Atualiza estatísticas dos times
         if (partidaAtual.Vencedor != null)
         {
             partidaAtual.Vencedor.AddVitoria();
@@ -81,7 +120,6 @@ public class GerenciadorPartidas
             partidaAtual.TimeB.AddEmpate();
         }
 
-        // Atualiza contagem de jogos
         jogosPorTime[partidaAtual.TimeA]++;
         jogosPorTime[partidaAtual.TimeB]++;
 
@@ -119,6 +157,30 @@ public class GerenciadorPartidas
         foreach (var time in timesDisponiveis.OrderByDescending(t => t.GetVitorias()))
         {
             Console.WriteLine($"{time.GetNome()}: {time.GetVitorias()}V/{time.GetDerrotas()}D/{time.GetEmpates()}E");
+        }
+    }
+
+    public List<Time> GetTimes()
+    {
+        return this.timesDisponiveis;
+    }
+
+    public void RemoverTime(string nome)
+    {
+        List<Time> timesParaRemover = new List<Time>();
+
+        foreach (Time time in timesDisponiveis)
+        {
+            if (time.GetNome() == nome)
+            {
+                timesParaRemover.Add(time);
+            }
+        }
+
+        foreach (Time time in timesParaRemover)
+        {
+            timesDisponiveis.Remove(time);
+            jogosPorTime.Remove(time);
         }
     }
 

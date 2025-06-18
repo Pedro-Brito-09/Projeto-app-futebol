@@ -41,6 +41,26 @@ public class Time
         this.jogadores.Remove(jogador);
     }
 
+    public void ListarJogadores()
+    {
+        if (this.jogadores.Count == 0)
+        {
+            Console.WriteLine($"  Nenhum jogador no time {this.nome}.");
+            return;
+        }
+
+        Console.WriteLine($"  Jogadores do time {this.nome}:");
+        foreach (var jogador in this.jogadores)
+        {
+            Console.WriteLine($"  - Id: {jogador.GetId()} | {jogador.GetNome()} | Idade: {jogador.GetIdade()} | Posição: {jogador.GetPosicao()}");
+        }
+    }
+
+    public void LimparTime()
+    {
+        this.jogadores.Clear();
+    }
+
     public string GetNome()
     {
         return this.nome;
@@ -79,5 +99,10 @@ public class Time
     public int GetEmpates()
     {
         return this.empates;
+    }
+
+    public List<Jogador> GetJogadores()
+    {
+        return this.jogadores;
     }
 }
